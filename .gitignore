@@ -2,7 +2,8 @@
 .idea/
 
 # Example API-returned data
-data/
+data/*
+!data/champions.json
 
 # Logs
 logs
