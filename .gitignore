@@ -1,6 +1,9 @@
 # JetBrains IDE
 .idea/
 
+# Example API-returned data
+data/
+
 # Logs
 logs
 *.log
