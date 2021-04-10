@@ -16,8 +16,6 @@ const mapChampionNameToId = () => {
     return championMap
 }
 
-const ChampionList = mapChampionNameToId()
-
 /**
  * Limits a certain number with following logic: <br/>
  * * if the number is lower than min, selects min. <br/>
@@ -42,6 +40,12 @@ exports.limit = (gain = 0, min = -4, max = 4) => {
 exports.calculateGain = (gain, multiplier = 10, resultMultiplier = 1) => {
     return (gain * 10).toFixed(2) * resultMultiplier
 }
+
+/**
+ * Map containing every champion name mapped to its internal ID.
+ * @type {Map<number, string>}
+ */
+const ChampionList = mapChampionNameToId()
 
 /**
  * Gets the champion's name from its championId.
