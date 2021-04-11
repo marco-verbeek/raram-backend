@@ -55,3 +55,12 @@ const ChampionList = mapChampionNameToId()
 exports.getChampionNameById = (id) => {
     return ChampionList.get(parseInt(id)) ?? "Not found"
 }
+
+/**
+ * Formats the value provided to a 2-decimal float
+ * @param value the value you wish to format
+ * @returns {number} formatted value
+ */
+exports.format = (value) => {
+    return parseFloat(value.toFixed(2))
+}

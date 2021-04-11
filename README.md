@@ -28,4 +28,7 @@ Please create a .env file with following variables:
 | LEAGUE_API_PLATFORM_ID | euw1 | Riot API Region ID
 | DEFAULT_SUMMONER_NAME | ItsNexty | Default name used if none specified during GET /api/analysis
 | PORT | 5000 | ExpressJS Server Port
+| DB_USER | postgres | PgSQL Username
+| DB_PASSWORD | none | PgSQL Password
+| DB_PORT | 5432 | PgSQL Port
 

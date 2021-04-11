@@ -2,11 +2,12 @@
 require('dotenv').config()
 
 const _ = require('lodash');
+const db = require("../../src/database");
 
-const {limit, calculateGain, getChampionNameById} = require("../../utils/analysis_helper")
-const {leagueJs} = require('../../src/leagueJsSetup')
+const {limit, calculateGain, getChampionNameById, format} = require("../../utils/analysis_helper")
+const {leagueJs} = require('../../src/leagueJS_setup')
 
-exports.match_analysis = function (req, res){
+exports.match_analysis = async function (req, res){
     leagueJs.Summoner
         .gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
         .then(summonerData => {
@@ -38,7 +39,7 @@ exports.match_analysis = function (req, res){
  * @returns {{error: string}|{teamAvgDeaths: number, playerKills: number, playerDeaths: number, teamComparedHealedGain: number, playerDamageTaken: number, teamAvgDamageDone: number, teamComparedDamageGain: number, teamComparedTankedGain: number, summonerName, championPlayed: string, playerAssists: number, teamComparedKA: number, teamAvgKA: number, teamComparedDeaths: number, teamComparedKAGain: number, teamAvgDamageTaken: number, playerKA: number, playerDamageDone: number, teamAvgHealed: number, lpGain: number, teamComparedDeathsGain: number, teamComparedBestDTH: unknown, winConditionGain: number, playerHealed: number}}
  */
 const performAnalysis = (matchData, accountId) => {
-    if(matchData["queueId"] !== 450)
+    if (matchData["queueId"] !== 450)
         return {"error": "queueId was not ARAM"}
 
     const participantIdentity = _.find(matchData["participantIdentities"], {player: {accountId: accountId}})
@@ -51,11 +52,13 @@ const performAnalysis = (matchData, accountId) => {
     const championId = participant["championId"]
     const championName = getChampionNameById(championId)
 
-    let allyTotalKills = 0, allyTotalDeaths = 0, allyTotalAssists = 0, allyTotalDamage = 0, allyTotalTanked = 0, allyTotalHealed = 0
-    let playerKills = 0, playerDeaths = 0, playerAssists = 0, playerKA = 0, playerDamage = 0, playerTanked = 0, playerHealed = 0
+    let allyTotalKills = 0, allyTotalDeaths = 0, allyTotalAssists = 0, allyTotalDamage = 0, allyTotalTanked = 0,
+        allyTotalHealed = 0
+    let playerKills = 0, playerDeaths = 0, playerAssists = 0, playerKA = 0, playerDamage = 0, playerTanked = 0,
+        playerHealed = 0
 
-    _.forEach(matchData["participants"], function(value) {
-        if(value["teamId"] === teamId){
+    _.forEach(matchData["participants"], function (value) {
+        if (value["teamId"] === teamId) {
             allyTotalKills += value["stats"]["kills"]
             allyTotalDeaths += value["stats"]["deaths"]
             allyTotalAssists += value["stats"]["assists"]
@@ -64,7 +67,7 @@ const performAnalysis = (matchData, accountId) => {
             allyTotalTanked += value["stats"]["totalDamageTaken"]
             allyTotalHealed += value["stats"]["totalHeal"]
 
-            if(value["participantId"] === participantId){
+            if (value["participantId"] === participantId) {
                 playerKills = value["stats"]["kills"]
                 playerDeaths = value["stats"]["deaths"]
                 playerAssists = value["stats"]["assists"]
@@ -89,10 +92,9 @@ const performAnalysis = (matchData, accountId) => {
     const allyAvgTanked = allyTotalTanked / 5
     const allyAvgHealed = allyTotalHealed / 5
 
-    const teamComparedDeaths = (playerDeaths - allyAvgDeaths) / allyAvgDeaths
-    const teamComparedKA = (playerKA - allyAvgKA) / allyAvgKA
+    const teamComparedDeaths = format((playerDeaths - allyAvgDeaths) / allyAvgDeaths)
+    const teamComparedKA = format((playerKA - allyAvgKA) / allyAvgKA)
 
-    // TODO: is this the wrong formula??? Should I divide by 5 instead of allyAvgX ?
     const teamComparedDamage = (playerDamage - allyAvgDamage) / allyAvgDamage
     const teamComparedTanked = (playerTanked - allyAvgTanked) / allyAvgTanked
     const teamComparedHealed = (playerHealed - allyAvgHealed) / allyAvgHealed
@@ -113,7 +115,15 @@ const performAnalysis = (matchData, accountId) => {
 
     const teamComparedBestOfTDH = _.max([teamComparedDamageGain, teamComparedTankedGain, teamComparedHealedGain])
 
-    const lpGain = winGain + teamComparedKAGain + teamComparedDeathsGain + teamComparedBestOfTDH
+    let lpGain = winGain + teamComparedKAGain + teamComparedDeathsGain + teamComparedBestOfTDH
+    lpGain = parseFloat(lpGain.toFixed(2))
+
+    // Add LP to player, if he exists in DB.
+    db.query('SELECT account_id FROM raram.users WHERE summoner_name = $1', [summonerName])
+    .then(result => {
+        if(result.rowCount !== 0)
+            db.query('UPDATE raram.users SET lp = lp + $1 WHERE account_id = $2', [lpGain, result.rows[0]["account_id"]])
+    })
 
     return {
         "summonerName": summonerName,
@@ -124,8 +134,8 @@ const performAnalysis = (matchData, accountId) => {
         "playerKA": playerKA,
         "teamAvgKA": allyAvgKA,
         "teamAvgDeaths": allyAvgDeaths,
-        "teamComparedKA": parseFloat(teamComparedKA.toFixed(2)),
-        "teamComparedDeaths": parseFloat(teamComparedDeaths.toFixed(2)),
+        "teamComparedKA": teamComparedKA,
+        "teamComparedDeaths": teamComparedDeaths,
         "winConditionGain": winGain,
         "teamComparedDeathsGain": teamComparedDeathsGain,
         "teamComparedKAGain": teamComparedKAGain,
@@ -139,7 +149,7 @@ const performAnalysis = (matchData, accountId) => {
         "teamComparedTankedGain": teamComparedTankedGain,
         "teamComparedHealedGain": teamComparedHealedGain,
         "teamComparedBestDTH": teamComparedBestOfTDH,
-        "lpGain": parseFloat(lpGain.toFixed(2)),
+        "lpGain": lpGain,
     }
 
     // determine average of enemy team rank & ally team rank

@@ -1,5 +1,5 @@
-const express = require("express")
-const router = express.Router()
+const Router = require("express-promise-router")
+const router = new Router()
 
 const analysis_controller = require("./controllers/analysis_controller")
 const overview_controller = require("./controllers/overview_controller")
@@ -13,5 +13,6 @@ router.get("/overview", overview_controller.overview)
 
 // This endpoint provides the information linked to the player's profile.
 router.get("/profile", profile_controller.profile_summary)
+router.get("/profile/verify", profile_controller.profile_verify)
 
 module.exports = router;
