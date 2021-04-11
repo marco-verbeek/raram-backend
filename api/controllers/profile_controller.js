@@ -1,9 +1,11 @@
 const db = require("../../src/database")
+
 const {getRandomIcons} = require("../../utils/verification_helper");
+const {leagueJs} = require('../../src/leagueJS_setup')
 
 exports.profile_summary = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
-
+    
     db.query('SELECT summoner_name, lp FROM raram.users WHERE summoner_name = $1', [summonerName])
     .then(result => {
         if(result.rowCount === 0)
@@ -19,14 +21,18 @@ exports.profile_summary = function (req, res){
 }
 
 exports.profile_verify = function (req, res){
-    const accountId = '_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g'
+    const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
     const iconIds = getRandomIcons()
 
-    db.query('SELECT * FROM raram.verifications WHERE account_id = $1', [accountId])
+    leagueJs.Summoner.gettingByName(summonerName)
+    .then(result => {
+        const accountId = result["accountId"]
+
+        return db.query('SELECT * FROM raram.verifications WHERE account_id = $1', [accountId])
+    })
     .then(result => {
         if(result.rowCount !== 0)
             return db.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', [accountId, iconIds])
-
         return db.query('INSERT INTO raram.verifications(account_id, icons) VALUES($1, $2)', [accountId, iconIds])
     })
     .then(result => {
@@ -49,6 +55,9 @@ exports.profile_verify = function (req, res){
         ]
 
         return res.json(icons).status(200).end()
+    })
+    .catch(() => {
+        return res.json({"error": "Could not find summoner by name"})
     })
 }
 
