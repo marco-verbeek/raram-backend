@@ -1,11 +1,11 @@
 const db = require("../../src/database")
 
-const {getRandomIcons} = require("../../utils/verification_helper");
+const {getRandomIcons, removeIfContained} = require("../../utils/verification_helper");
 const {leagueJs} = require('../../src/leagueJS_setup')
 
 exports.profile_summary = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
-    
+
     db.query('SELECT summoner_name, lp FROM raram.users WHERE summoner_name = $1', [summonerName])
     .then(result => {
         if(result.rowCount === 0)
@@ -57,14 +57,39 @@ exports.profile_verify = function (req, res){
         return res.json(icons).status(200).end()
     })
     .catch(() => {
-        return res.json({"error": "Could not find summoner by name"})
+        return res.json({"error": "Could not find summoner by name"}).status(500).end()
     })
 }
 
 exports.icon_verify = function (req, res){
-    // check in db if ongoing verification
-    // if not, stop
-    // verify if there is an icon left to verify
-    // if there is, iterate over them and verify if current player icon == iconId
-    // if it is, indicate true to that icon verified
+    const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
+    let currentIconId = 0, accountId
+
+    leagueJs.Summoner.gettingByName(summonerName)
+    .then(result => {
+        currentIconId = result["profileIconId"]
+        accountId = result["accountId"]
+
+        return db.query('SELECT icons FROM raram.verifications WHERE account_id = $1', [accountId])
+    })
+    .then(result => {
+        if(result.rowCount === 0)
+            return res.json({"error": "Could not find verification for this summoner. Have you started a verification process?"}).status(500).end()
+
+        const iconIdsLeft = {
+            "icons": removeIfContained(result.rows[0]["icons"], parseInt(currentIconId)),
+            "currentIconId": currentIconId
+        }
+
+        db.query('UPDATE raram.verifications SET icons = $1 WHERE account_id = $2', [iconIdsLeft.icons, accountId])
+        .then(() => {
+            if(result.rowCount !== 1)
+                return res.json({"error": "could not update icon verification in database"}).status(500).end()
+
+            return res.json(iconIdsLeft).status(200).end()
+        })
+    })
+    .catch(() => {
+        return res.json({"error": "Could not find summoner by name"}).status(500).end()
+    })
 }

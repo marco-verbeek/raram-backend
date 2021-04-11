@@ -14,5 +14,6 @@ router.get("/overview", overview_controller.overview)
 // This endpoint provides the information linked to the player's profile.
 router.get("/profile", profile_controller.profile_summary)
 router.get("/profile/verify", profile_controller.profile_verify)
+router.get("/profile/verificon", profile_controller.icon_verify)
 
 module.exports = router;

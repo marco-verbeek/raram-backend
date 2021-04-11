@@ -9,26 +9,26 @@ const {leagueJs} = require('../../src/leagueJS_setup')
 
 exports.match_analysis = async function (req, res){
     leagueJs.Summoner
-        .gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
-        .then(summonerData => {
-            return leagueJs.Match.gettingListByAccount(summonerData["accountId"], "euw1", {queue: [450], endIndex: 1})
-        })
-        .then(matchesData => {
-            return leagueJs.Match.gettingById(matchesData["matches"][0]["gameId"])
-        })
-        .then(matchData => {
-            let matchAnalysisResult = []
+    .gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
+    .then(summonerData => {
+        return leagueJs.Match.gettingListByAccount(summonerData["accountId"], "euw1", {queue: [450], endIndex: 1})
+    })
+    .then(matchesData => {
+        return leagueJs.Match.gettingById(matchesData["matches"][0]["gameId"])
+    })
+    .then(matchData => {
+        let matchAnalysisResult = []
 
-            // TODO: cleanup. No need to forEach participants, calculate everything once.
-            _.forEach(matchData["participantIdentities"], function (participant) {
-                matchAnalysisResult.push(performAnalysis(matchData, participant["player"]["accountId"]))
-            })
+        // TODO: cleanup. No need to forEach participants, calculate everything once.
+        _.forEach(matchData["participantIdentities"], function (participant) {
+            matchAnalysisResult.push(performAnalysis(matchData, participant["player"]["accountId"]))
+        })
 
-            return res.json(matchAnalysisResult).status(200).end();
-        })
-        .catch(error => {
-            console.error(error)
-        })
+        return res.json(matchAnalysisResult).status(200).end();
+    })
+    .catch(() => {
+        return res.json({"error": "Could not find summoner by name"}).status(500).end()
+    })
 }
 
 /**
