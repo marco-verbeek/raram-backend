@@ -19,25 +19,20 @@ exports.profile_summary = function (req, res){
 }
 
 exports.profile_verify = function (req, res){
-    // check if there's an ongoing verification in db
-    // if there is, stop that one
-    // create a new verification row in db
-    // returns a json array of 3 iconIds and a boolean indicating whether they've been verified
-
     const accountId = '_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g'
     const iconIds = getRandomIcons()
 
     db.query('SELECT * FROM raram.verifications WHERE account_id = $1', [accountId])
     .then(result => {
         if(result.rowCount !== 0)
-            db.query('DELETE FROM raram.verifications WHERE account_id = $1', [accountId])
+            return db.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', [accountId, iconIds])
 
         return db.query('INSERT INTO raram.verifications(account_id, icons) VALUES($1, $2)', [accountId, iconIds])
     })
     .then(result => {
         if(result.rowCount !== 1)
             return res.json({"error": "could not add verification in database"}).status(500).end()
-        
+
         const icons = [
             {
                 "iconId": iconIds[0],
@@ -50,7 +45,7 @@ exports.profile_verify = function (req, res){
             {
                 "iconId": iconIds[2],
                 "verified": false
-            },
+            }
         ]
 
         return res.json(icons).status(200).end()
