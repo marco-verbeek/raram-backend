@@ -14,6 +14,11 @@ npm install
 npm start
 ```
 
+### Run tests (Uses Jest & Supertest)
+```
+npm test
+```
+
 ### Configuration
 Please create a .env file with following variables:
 
