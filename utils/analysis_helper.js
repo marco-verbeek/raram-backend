@@ -3,7 +3,6 @@ const _ = require('lodash');
 /**
  * Creates a new Map containing each champion's Id as key, and its name as value.
  * @returns {Map<number, string>}
- * @note This function definately needs to be placed elsewhere.
  */
 const mapChampionNameToId = () => {
     const champions = require('../data/champions.json')
@@ -78,7 +77,7 @@ function getParticipantIdentity(matchData, participantId) {
 /**
  * Analyses a game coming from Riot's API
  * @param matchData comes from a GET on /lol/match/v4/matches/{matchId}
- * @returns {{teams: *[], players: *[]}} an array filled with team- and playerdata.
+ * @returns {{teams: *[], players: *[]}} an array filled with team- and player data.
  */
 exports.performMatchAnalysis = (matchData) => {
     const players = []
