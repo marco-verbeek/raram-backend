@@ -99,7 +99,7 @@ exports.performMatchAnalysis = (matchData) => {
         participant["deaths"] = e["stats"]["deaths"]
         participant["assists"] = e["stats"]["assists"]
 
-        participant["KA"] = e["stats"]["kills"] + e["stats"]["assists"]
+        participant["KP"] = e["stats"]["kills"] + e["stats"]["assists"]
 
         participant["damageDone"] = e["stats"]["totalDamageDealtToChampions"]
         participant["damageTaken"] = e["stats"]["totalDamageTaken"]
@@ -134,7 +134,7 @@ exports.performMatchAnalysis = (matchData) => {
 
     // Calculate team-averages
     _.forEach(teams, function(team){
-        team["avgKA"] = (team["totalKills"] + team["totalAssists"]) / 5
+        team["avgKP"] = (team["totalKills"] + team["totalAssists"]) / 5
         team["avgDeaths"] = team["totalDeaths"] / 5
 
         team["avgDamageDone"] = team["totalDamageDone"] / 5
@@ -146,21 +146,21 @@ exports.performMatchAnalysis = (matchData) => {
     _.forEach(players, function(player){
         const team = _.find(teams, {teamId: player["teamId"]})
 
-        player["teamComparedKA"] = format((player["KA"] - team["avgKA"]) / team["avgKA"])
+        player["teamComparedKP"] = format((player["KP"] - team["avgKP"]) / team["avgKP"])
         player["teamComparedDeaths"] = format((player["deaths"] - team["avgDeaths"]) / team["avgDeaths"])
 
         player["teamComparedDamageDone"] = format((player["damageDone"] - team["avgDamageDone"]) / team["avgDamageDone"])
         player["teamComparedDamageTaken"] = format((player["damageTaken"] - team["avgDamageTaken"]) / team["avgDamageTaken"])
         player["teamComparedHealed"] = format((player["healed"] - team["avgHealed"]) / team["avgHealed"])
 
-        player["KAGain"] = calculateGain(player["teamComparedKA"], 10, 2)
+        player["KPGain"] = calculateGain(player["teamComparedKP"], 10, 2)
         player["deathsGain"] = calculateGain(player["teamComparedDeaths"], 10, -1)
 
         player["damageDoneGain"] = calculateGain(player["teamComparedDamageDone"])
         player["damageTakenGain"] = calculateGain(player["teamComparedDamageTaken"])
         player["healedGain"] = calculateGain(player["teamComparedHealed"])
 
-        player["lpGain"] = format((team["win"] ? 10 : -10) + player["KAGain"] + player["deathsGain"] + (_.max([player["damageDoneGain"], player["damageTakenGain"], player["healedGain"]])))
+        player["lpGain"] = format((team["win"] ? 10 : -10) + player["KPGain"] + player["deathsGain"] + (_.max([player["damageDoneGain"], player["damageTakenGain"], player["healedGain"]])))
     })
 
     return {
