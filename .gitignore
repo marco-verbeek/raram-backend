@@ -1,9 +1,10 @@
 # JetBrains IDE
 .idea/
 
-# Example API-returned data
+# Example API-returned data shouldn't be shared. Other data should.
 data/*
 !data/champions.json
+!data/db_init.sql
 
 # Logs
 logs
