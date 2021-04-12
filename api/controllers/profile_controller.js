@@ -23,10 +23,11 @@ exports.profile_summary = function (req, res){
 exports.profile_verify = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
     const iconIds = getRandomIcons()
+    let accountId = ''
 
     leagueJs.Summoner.gettingByName(summonerName)
     .then(result => {
-        const accountId = result["accountId"]
+        accountId = result["accountId"]
 
         return db.query('SELECT * FROM raram.verifications WHERE account_id = $1', [accountId])
     })
@@ -39,22 +40,7 @@ exports.profile_verify = function (req, res){
         if(result.rowCount !== 1)
             return res.json({"error": "could not add verification in database"}).status(500).end()
 
-        const icons = [
-            {
-                "iconId": iconIds[0],
-                "verified": false
-            },
-            {
-                "iconId": iconIds[1],
-                "verified": false
-            },
-            {
-                "iconId": iconIds[2],
-                "verified": false
-            }
-        ]
-
-        return res.json(icons).status(200).end()
+        return res.json({"icons": iconIds}).status(200).end()
     })
     .catch(() => {
         return res.json({"error": "Could not find summoner by name"}).status(500).end()
@@ -85,6 +71,9 @@ exports.icon_verify = function (req, res){
         .then(() => {
             if(result.rowCount !== 1)
                 return res.json({"error": "could not update icon verification in database"}).status(500).end()
+
+            if(iconIdsLeft.icons.length === 0)
+                db.query('INSERT INTO raram.users(summoner_name, account_id) VALUES($1, $2)', [summonerName, accountId])
 
             return res.json(iconIdsLeft).status(200).end()
         })
