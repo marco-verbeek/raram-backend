@@ -2,9 +2,11 @@ DROP SCHEMA IF EXISTS raram CASCADE;
 CREATE SCHEMA raram;
 
 CREATE TABLE raram.users (
-	summoner_name VARCHAR (16) PRIMARY KEY,
 	account_id VARCHAR (64) UNIQUE NOT NULL,
-	lp FLOAT DEFAULT 0
+	summoner_name VARCHAR (16),
+	lp FLOAT DEFAULT 0,
+	
+	PRIMARY KEY(account_id)
 );
 					   
 CREATE TABLE raram.verifications (
@@ -18,8 +20,15 @@ CREATE TABLE raram.matches (
 	account_id VARCHAR (64) NOT NULL,
 	champion_id INTEGER NOT NULL,
 	date TIMESTAMP DEFAULT current_timestamp,
-	lp_gain INTEGER DEFAULT 0,
+	lp_gain FLOAT DEFAULT 0,
 	
 	PRIMARY KEY(match_id, account_id),
 	CONSTRAINT fk_account_id FOREIGN KEY(account_id) REFERENCES raram.users(account_id)
 );
+
+INSERT INTO raram.verifications(account_id, icons) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g', '{}');
+INSERT INTO raram.users(account_id, summoner_name) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g', 'ItsNexty');
+
+--SELECT * FROM raram.users;
+--SELECT * FROM raram.verifications;
+--SELECT * FROM raram.matches;

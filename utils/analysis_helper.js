@@ -91,6 +91,7 @@ exports.performMatchAnalysis = (matchData) => {
         participant["accountId"] = identity["player"]["accountId"]
         participant["summonerName"] = identity["player"]["summonerName"]
 
+        participant["championId"] = e["championId"]
         participant["champion"] = getChampionNameById(e["championId"])
         participant["teamId"] = e["teamId"]
 
@@ -164,15 +165,21 @@ exports.performMatchAnalysis = (matchData) => {
 
     return {
         "teams": teams,
-        "players": players
+        "players": players,
+        "match": {
+            "gameDuration": matchData["gameDuration"],
+            "gameCreation": matchData["gameCreation"],
+            "queueId": matchData["queueId"]
+        }
     }
+}
 
-    /*
-    // Add LP to player, if he exists in DB.
-    db.query('SELECT account_id FROM raram.users WHERE summoner_name = $1', [summonerName])
-    .then(result => {
-        if(result.rowCount !== 0)
-            db.query('UPDATE raram.users SET lp = lp + $1 WHERE account_id = $2', [lpGain, result.rows[0]["account_id"]])
-    })
-     */
+/**
+ * Returns the playerInfo part of a whole matchData using a player's accountId.
+ * @param matchData returned by performMatchAnalysis()
+ * @param accountId Riot API string representing the player's account identifier
+ * @returns {{accountId: number, summonerName: string, ...}}
+ */
+exports.playerInfoFromAnalysis = (matchData, accountId) => {
+    return _.find(matchData["players"], {accountId: accountId})
 }
