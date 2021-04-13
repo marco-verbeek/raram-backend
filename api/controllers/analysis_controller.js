@@ -22,36 +22,26 @@ exports.match_analysis = async function (req, res){
         const matchAnalysis = performMatchAnalysis(matchData)
         const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
 
-        // TODO: put code somewhere more appropriate
-        db.query('SELECT * FROM raram.matches WHERE match_id = $1 AND account_id = $2', [matchData["gameId"], accountId])
+        db.getUserByAccountId([accountId])
         .then(result => {
-            if(result.rowCount === 0){
-                console.log("Match was not found in DB")
+            if(result.rowCount === 0)
+                return res.json(matchAnalysis).status(200).end()
 
-                db.query('INSERT INTO raram.matches(match_id, account_id, champion_id, date, lp_gain) VALUES($1, $2, $3, to_timestamp($4 / 1000.0), $5)', [
-                    matchData["gameId"],
-                    accountId,
-                    playerData["championId"],
-                    matchAnalysis["match"]["gameCreation"],
-                    playerData["lpGain"]
-                ])
-                .then(() => {
-                    console.log("Added match to DB.")
-
-                    db.query('UPDATE raram.users SET lp = lp + $2 WHERE account_id = $1', [accountId, playerData["lpGain"]])
+            db.getMatchByIds([matchData["gameId"], accountId])
+            .then(result => {
+                if(result.rowCount === 0){
+                    db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
                     .then(() => {
-                       console.log("Added LP to player in DB.")
+                        db.addPlayerLP([accountId, playerData["lpGain"]])
                     })
-                })
-            } else {
-                console.log("Match was already in DB.")
-            }
+                }
 
-            return res.json(matchAnalysis).status(200).end();
+                return res.json(matchAnalysis).status(200).end();
+            })
         })
     })
     .catch(err => {
-        console.log(err)
+        console.error(err)
         return res.json({"error": "An error occurred during match analysis"}).status(500).end()
     })
 }
