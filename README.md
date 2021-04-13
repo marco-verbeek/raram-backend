@@ -1,6 +1,5 @@
 # Ranked ARAM Tool
-Spare-time created tool with friends.
-
+Spare-time created tool with friends. <br/>
 "Compare your performance to your team's using rARAM.gg!"
 
 
@@ -20,6 +19,9 @@ npm test
 ```
 
 ### Configuration
+This project requires a PostgreSQL database. Originally created with PgSQL v12.3.
+<br/>Import the db_init.sql file located in the data folder.
+
 Please create a .env file with following variables:
 
 | VARIABLE | DEFAULT VALUE | DESCRIPTION
