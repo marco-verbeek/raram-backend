@@ -54,7 +54,11 @@ exports.profile_verify = function (req, res){
 
 exports.icon_verify = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
+    const alreadyVerified = req.query.verified ?? false
     let currentIconId = 0, accountId
+
+    if(alreadyVerified)
+        return res.json({"error": "This profile has already been locally verified"}).status(200).end()
 
     leagueJs.Summoner.gettingByName(summonerName)
     .then(result => {
