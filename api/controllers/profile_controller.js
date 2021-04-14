@@ -6,7 +6,7 @@ const {leagueJs} = require('../../src/leagueJS_setup')
 exports.profile_summary = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
 
-    db.query('SELECT summoner_name, lp FROM raram.users WHERE summoner_name = $1', [summonerName])
+    db.getSummonerByName([summonerName])
     .then(result => {
         if(result.rowCount === 0)
             return res.json({error: "Could not find player profile"}).status(500).end()
@@ -29,12 +29,12 @@ exports.profile_verify = function (req, res){
     .then(result => {
         accountId = result["accountId"]
 
-        return db.query('SELECT * FROM raram.verifications WHERE account_id = $1', [accountId])
+        return db.getVerificationFromId([accountId])
     })
     .then(result => {
         if(result.rowCount !== 0)
-            return db.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', [accountId, iconIds])
-        return db.query('INSERT INTO raram.verifications(account_id, icons) VALUES($1, $2)', [accountId, iconIds])
+            return db.updateVerificationIconsById([accountId, iconIds])
+        return db.insertVerification([accountId, iconIds])
     })
     .then(result => {
         if(result.rowCount !== 1)
@@ -56,7 +56,7 @@ exports.icon_verify = function (req, res){
         currentIconId = result["profileIconId"]
         accountId = result["accountId"]
 
-        return db.query('SELECT icons FROM raram.verifications WHERE account_id = $1', [accountId])
+        return db.getVerificationFromId([accountId])
     })
     .then(result => {
         if(result.rowCount === 0)
@@ -67,13 +67,13 @@ exports.icon_verify = function (req, res){
             "currentIconId": currentIconId
         }
 
-        db.query('UPDATE raram.verifications SET icons = $1 WHERE account_id = $2', [iconIdsLeft.icons, accountId])
+        db.updateVerificationIconsById([accountId, iconIdsLeft.icons])
         .then(() => {
             if(result.rowCount !== 1)
                 return res.json({"error": "could not update icon verification in database"}).status(500).end()
 
             if(iconIdsLeft.icons.length === 0)
-                db.query('INSERT INTO raram.users(summoner_name, account_id) VALUES($1, $2)', [summonerName, accountId])
+                db.insertUser([summonerName, accountId])
 
             return res.json(iconIdsLeft).status(200).end()
         })

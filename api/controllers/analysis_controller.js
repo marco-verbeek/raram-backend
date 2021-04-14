@@ -32,7 +32,7 @@ exports.match_analysis = async function (req, res){
                 if(result.rowCount === 0){
                     db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
                     .then(() => {
-                        db.addPlayerLP([accountId, playerData["lpGain"]])
+                        db.updatePlayerLP([accountId, playerData["lpGain"]])
                     })
                 }
 
