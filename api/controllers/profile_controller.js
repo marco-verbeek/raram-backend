@@ -1,7 +1,7 @@
 const db = require("../../src/database")
 
 const {getRandomIcons, removeIfContained} = require("../../utils/verification_helper");
-const {leagueJs} = require('../../src/leagueJS_setup')
+const {leagueJs} = require('../../src/league')
 
 exports.profile_summary = function (req, res){
     const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"

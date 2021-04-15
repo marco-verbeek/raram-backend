@@ -4,7 +4,7 @@ require('dotenv').config()
 const db = require("../../src/database");
 
 const {performMatchAnalysis, playerInfoFromAnalysis} = require("../../utils/analysis_helper")
-const {leagueJs} = require('../../src/leagueJS_setup')
+const {leagueJs} = require('../../src/league')
 
 exports.match_analysis = async function (req, res){
     let accountId = ""
