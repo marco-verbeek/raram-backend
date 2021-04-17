@@ -26,9 +26,37 @@ CREATE TABLE raram.matches (
 	CONSTRAINT fk_account_id FOREIGN KEY(account_id) REFERENCES raram.users(account_id)
 );
 
+CREATE TABLE raram.stats (
+	account_id VARCHAR (64) NOT NULL,
+	kills INTEGER DEFAULT 0,
+	assists INTEGER DEFAULT 0,
+	deaths INTEGER DEFAULT 0,
+	games_won INTEGER DEFAULT 0,
+	games_played INTEGER DEFAULT 0,
+	damage_done INTEGER DEFAULT 0,
+	damage_taken INTEGER DEFAULT 0,
+	healed INTEGER DEFAULT 0,
+	double_kills INTEGER DEFAULT 0,
+	triple_kills INTEGER DEFAULT 0,
+	quadra_kills INTEGER DEFAULT 0,
+	penta_kills INTEGER DEFAULT 0,
+	gold_earned INTEGER DEFAULT 0,
+	gold_spent INTEGER DEFAULT 0,
+	minions_killed INTEGER DEFAULT 0,
+	first_bloods INTEGER DEFAULT 0,
+	longest_alive INTEGER DEFAULT 0,
+	current_streak INTEGER DEFAULT 0,
+	highest_winstreak INTEGER DEFAULT 0,
+	
+	PRIMARY KEY(account_id),
+	CONSTRAINT fk_account_id FOREIGN KEY(account_id) REFERENCES raram.users(account_id)
+);
+
 INSERT INTO raram.verifications(account_id, icons) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g', '{}');
 INSERT INTO raram.users(account_id, summoner_name) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g', 'ItsNexty');
+INSERT INTO raram.stats(account_id) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g');
 
 --SELECT * FROM raram.users;
 --SELECT * FROM raram.verifications;
 --SELECT * FROM raram.matches;
+--SELECT * FROM raram.stats;

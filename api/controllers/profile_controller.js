@@ -81,8 +81,12 @@ exports.icon_verify = function (req, res){
             if(result.rowCount !== 1)
                 return res.json({"error": "could not update icon verification in database"}).status(500).end()
 
-            if(iconIdsLeft.icons.length === 0)
+            if(iconIdsLeft.icons.length === 0){
                 db.insertUser([summonerName, accountId])
+                .then(() => {
+                    db.insertStats([accountId])
+                })
+            }
 
             return res.json(iconIdsLeft).status(200).end()
         })
