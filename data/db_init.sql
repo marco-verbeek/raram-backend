@@ -56,6 +56,18 @@ INSERT INTO raram.verifications(account_id, icons) VALUES('_LtStkq6nDAuthlcw8ns0
 INSERT INTO raram.users(account_id, summoner_name) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g', 'ItsNexty');
 INSERT INTO raram.stats(account_id) VALUES('_LtStkq6nDAuthlcw8ns0c_SRdnyuoguzmLIAmyL5YVF_g');
 
+INSERT INTO raram.verifications(account_id, icons) VALUES('H6zFnXpuZvZuWwpHScsdT30NTFynN2XvM_2ulZwqn8400kA', '{}');
+INSERT INTO raram.users(account_id, summoner_name) VALUES('H6zFnXpuZvZuWwpHScsdT30NTFynN2XvM_2ulZwqn8400kA', 'ItsWolfy');
+INSERT INTO raram.stats(account_id) VALUES('H6zFnXpuZvZuWwpHScsdT30NTFynN2XvM_2ulZwqn8400kA');
+
+INSERT INTO raram.verifications(account_id, icons) VALUES('t-gqEaZF54d30hskcUpAKgH8MaYoiFIoQnmkrOyrokSaGQA', '{}');
+INSERT INTO raram.users(account_id, summoner_name) VALUES('t-gqEaZF54d30hskcUpAKgH8MaYoiFIoQnmkrOyrokSaGQA', '0wly');
+INSERT INTO raram.stats(account_id) VALUES('t-gqEaZF54d30hskcUpAKgH8MaYoiFIoQnmkrOyrokSaGQA');
+
+INSERT INTO raram.verifications(account_id, icons) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA', '{}');
+INSERT INTO raram.users(account_id, summoner_name) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA', 'ItsDucky');
+INSERT INTO raram.stats(account_id) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA');
+
 --SELECT * FROM raram.users;
 --SELECT * FROM raram.verifications;
 --SELECT * FROM raram.matches;

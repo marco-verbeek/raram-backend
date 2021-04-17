@@ -53,6 +53,9 @@ exports.match_analysis = async function (req, res){
                                 playerData["firstBloodKill"] ? 1 : 0,
                                 playerData["longestTimeSpentLiving"]
                             ])
+                            .then(() => {
+                                db.updateHighestWinstreak(accountId)
+                            })
                         })
                     })
                 }
