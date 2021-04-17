@@ -29,8 +29,8 @@ CREATE TABLE raram.matches (
 CREATE TABLE raram.stats (
 	account_id VARCHAR (64) NOT NULL,
 	kills INTEGER DEFAULT 0,
-	assists INTEGER DEFAULT 0,
 	deaths INTEGER DEFAULT 0,
+	assists INTEGER DEFAULT 0,
 	games_won INTEGER DEFAULT 0,
 	games_played INTEGER DEFAULT 0,
 	damage_done INTEGER DEFAULT 0,
@@ -45,7 +45,7 @@ CREATE TABLE raram.stats (
 	minions_killed INTEGER DEFAULT 0,
 	first_bloods INTEGER DEFAULT 0,
 	longest_alive INTEGER DEFAULT 0,
-	current_streak INTEGER DEFAULT 0,
+	current_winstreak INTEGER DEFAULT 0,
 	highest_winstreak INTEGER DEFAULT 0,
 	
 	PRIMARY KEY(account_id),

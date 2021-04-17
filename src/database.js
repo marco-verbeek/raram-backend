@@ -8,6 +8,29 @@ pool = new Pool({
     port: process.env.DB_PORT || 5432,
 })
 
+// Is there any way to make this query more robust ?
+const UPDATE_PLAYER_STATS_QUERY = 'UPDATE raram.stats SET ' +
+    'kills = kills + $2,' +
+    'deaths = deaths + $3,' +
+    'assists = assists + $4,' +
+    'games_won = games_won + $5,' +
+    'games_played = games_played + 1,' +
+    'damage_done = damage_done + $6,' +
+    'damage_taken = damage_taken + $7,' +
+    'healed = healed + $8,' +
+    'double_kills = double_kills + $9,' +
+    'triple_kills = triple_kills + $10,' +
+    'quadra_kills = quadra_kills + $11,' +
+    'penta_kills = penta_kills + $12,' +
+    'gold_earned = gold_earned + $13,' +
+    'gold_spent = gold_spent + $14,' +
+    'minions_killed = minions_killed + $15,' +
+    'first_bloods = first_bloods + $16,' +
+    'longest_alive = CASE WHEN $17 > longest_alive THEN $17 ELSE longest_alive END,' +
+    'current_winstreak = CASE WHEN $5 > 0 THEN current_winstreak + 1 ELSE 0 END,' +
+    'highest_winstreak = CASE WHEN current_winstreak > highest_winstreak THEN current_winstreak ELSE highest_winstreak END ' +
+    'WHERE account_id = $1'
+
 module.exports = {
     query: (text, params) => pool.query(text, params),
 
@@ -23,4 +46,5 @@ module.exports = {
 
     updatePlayerLP: (params) => pool.query('UPDATE raram.users SET lp = lp + $2 WHERE account_id = $1', params),
     updateVerificationIconsById: (params) => pool.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', params),
+    updatePlayerStats: (params) => pool.query(UPDATE_PLAYER_STATS_QUERY, params)
 }

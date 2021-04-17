@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const db = require("../../src/database");
 
-const {performMatchAnalysis, playerInfoFromAnalysis} = require("../../utils/analysis_helper")
+const {performMatchAnalysis, playerInfoFromAnalysis, getWinFromAnalysis} = require("../../utils/analysis_helper")
 const {leagueJs} = require('../../src/league')
 
 exports.match_analysis = async function (req, res){
@@ -33,6 +33,27 @@ exports.match_analysis = async function (req, res){
                     db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
                     .then(() => {
                         db.updatePlayerLP([accountId, playerData["lpGain"]])
+                        .then(() => {
+                            db.updatePlayerStats([
+                                accountId,
+                                playerData["kills"],
+                                playerData["deaths"],
+                                playerData["assists"],
+                                getWinFromAnalysis(matchAnalysis, accountId) ? 1 : 0,
+                                playerData["damageDone"],
+                                playerData["damageTaken"],
+                                playerData["healed"],
+                                playerData["doubleKills"],
+                                playerData["tripleKills"],
+                                playerData["quadraKills"],
+                                playerData["pentaKills"],
+                                playerData["goldEarned"],
+                                playerData["goldSpent"],
+                                playerData["totalMinionsKilled"],
+                                playerData["firstBloodKill"] ? 1 : 0,
+                                playerData["longestTimeSpentLiving"]
+                            ])
+                        })
                     })
                 }
 

@@ -105,6 +105,18 @@ exports.performMatchAnalysis = (matchData) => {
         participant["damageTaken"] = e["stats"]["totalDamageTaken"]
         participant["healed"] = e["stats"]["totalHeal"]
 
+        participant["doubleKills"] = e["stats"]["doubleKills"]
+        participant["tripleKills"] = e["stats"]["tripleKills"]
+        participant["quadraKills"] = e["stats"]["quadraKills"]
+        participant["pentaKills"] = e["stats"]["pentaKills"]
+
+        participant["goldEarned"] = e["stats"]["goldEarned"]
+        participant["goldSpent"] = e["stats"]["goldSpent"]
+
+        participant["totalMinionsKilled"] = e["stats"]["totalMinionsKilled"]
+        participant["firstBloodKill"] = e["stats"]["firstBloodKill"]
+        participant["longestTimeSpentLiving"] = e["stats"]["longestTimeSpentLiving"]
+
         players.push(participant)
 
         // Team-related information
@@ -182,4 +194,17 @@ exports.performMatchAnalysis = (matchData) => {
  */
 exports.playerInfoFromAnalysis = (matchData, accountId) => {
     return _.find(matchData["players"], {accountId: accountId})
+}
+
+/**
+ * Returns whether the player linked with accountId won the game or not.
+ * @param matchData the game in question
+ * @param accountId the player in question
+ * @returns boolean victory
+ */
+exports.getWinFromAnalysis = (matchData, accountId) => {
+    const player = _.find(matchData["players"], { accountId: accountId })
+    const playerTeamId = player["teamId"]
+
+    return _.find(matchData["teams"], {teamId: playerTeamId})["win"]
 }
