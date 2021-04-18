@@ -41,9 +41,13 @@ exports.match_analysis = async function (req, res){
 
     const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
 
+    // If the game has not been added to the database previously
     if(dbMatch.rowCount === 0){
+        console.log("match was not in db. adding now.")
+
         await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
-        await db.updatePlayerLP([accountId, playerData["lpGain"]])
+        await db.updatePlayerLP([accountId])
+
 
         await db.updatePlayerStats([
             accountId,
@@ -65,7 +69,7 @@ exports.match_analysis = async function (req, res){
             playerData["longestTimeSpentLiving"]
         ])
 
-        await db.updateHighestWinstreak(accountId)
+        await db.updateHighestWinstreak([accountId])
     }
 
     return res.json(matchAnalysis).status(200).end();

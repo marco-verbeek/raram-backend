@@ -27,7 +27,7 @@ const UPDATE_PLAYER_STATS_QUERY = 'UPDATE raram.stats SET ' +
     'minions_killed = minions_killed + $15,' +
     'first_bloods = first_bloods + $16,' +
     'longest_alive = CASE WHEN $17 > longest_alive THEN $17 ELSE longest_alive END,' +
-    'current_winstreak = CASE WHEN $5 > 0 THEN current_winstreak + 1 ELSE 0 END' +
+    'current_winstreak = CASE WHEN $5 > 0 THEN current_winstreak + 1 ELSE 0 END ' +
     'WHERE account_id = $1'
 
 module.exports = {
@@ -45,7 +45,7 @@ module.exports = {
     getVerificationFromId: (params) => pool.query('SELECT * FROM raram.verifications WHERE account_id = $1', params),
     getRecentMatches: (params) => pool.query('SELECT * FROM raram.matches WHERE account_id = $1', params),
 
-    updatePlayerLP: (params) => pool.query('UPDATE raram.users SET lp = lp + $2 WHERE account_id = $1', params),
+    updatePlayerLP: (params) => pool.query('UPDATE raram.users SET lp = (SELECT SUM(lp_gain) FROM raram.matches WHERE account_id = $1) WHERE account_id = $1', params),
     updateVerificationIconsById: (params) => pool.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', params),
     updatePlayerStats: (params) => pool.query(UPDATE_PLAYER_STATS_QUERY, params),
     updateHighestWinstreak: (params) => pool.query('UPDATE raram.stats SET highest_winstreak = CASE WHEN current_winstreak >= highest_winstreak THEN current_winstreak ELSE highest_winstreak END WHERE account_id = $1', params)
