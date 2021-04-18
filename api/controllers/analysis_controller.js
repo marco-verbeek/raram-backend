@@ -6,7 +6,7 @@ const db = require("../../src/database");
 const {performMatchAnalysis, playerInfoFromAnalysis, getWinFromAnalysis} = require("../../utils/analysis_helper")
 const {leagueJs} = require('../../src/league')
 
-exports.match_analysis = async function (req, res){
+exports.match_analysis = function (req, res){
     let accountId = ""
 
     leagueJs.Summoner
