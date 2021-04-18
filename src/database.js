@@ -42,10 +42,10 @@ module.exports = {
     getMatchByIds: (params) => pool.query('SELECT * FROM raram.matches WHERE match_id = $1 AND account_id = $2', params),
     getSummonerByName: (params) => pool.query('SELECT summoner_name, lp FROM raram.users WHERE summoner_name = $1', params),
     getVerificationFromId: (params) => pool.query('SELECT * FROM raram.verifications WHERE account_id = $1', params),
+    getRecentMatches: (params) => pool.query('SELECT * FROM raram.matches WHERE account_id = $1', params),
 
     updatePlayerLP: (params) => pool.query('UPDATE raram.users SET lp = lp + $2 WHERE account_id = $1', params),
     updateVerificationIconsById: (params) => pool.query('UPDATE raram.verifications SET icons=$2 WHERE account_id = $1', params),
     updatePlayerStats: (params) => pool.query(UPDATE_PLAYER_STATS_QUERY, params),
     updateHighestWinstreak: (params) => pool.query('UPDATE raram.stats SET highest_winstreak = CASE WHEN current_winstreak >= highest_winstreak THEN current_winstreak ELSE highest_winstreak END WHERE account_id = $1', params)
-
 }
