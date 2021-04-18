@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const db = require("../../src/database");
 
-const {performMatchAnalysis, playerInfoFromAnalysis, getWinFromAnalysis} = require("../../utils/analysis_helper")
+const {performMatchAnalysis, playerInfoFromAnalysis, getWinFromAnalysis, getRaramSearchedGames} = require("../../utils/analysis_helper")
 const {leagueJs} = require('../../src/league')
 
 exports.match_analysis = async function (req, res){
@@ -11,19 +11,21 @@ exports.match_analysis = async function (req, res){
 
     const summonerData = await leagueJs.Summoner.gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
     const accountId = summonerData["accountId"]
+    let limit
 
     const options = {"queue": [450]}
     if(dev){
-        options["endIndex"] = 1
-        //options["beginTime"] already defaults to 'now'.
+        limit = 1
+        options["endIndex"] = limit
     } else {
         const requirements = await db.getUserRaramRequirements([accountId])
 
-        options["endIndex"] = requirements.rows[0]["raram_amount"]
-        options["beginTime"] = requirements.rows[0]["raram_date"]
+        limit = requirements.rows[0]["raram_amount"]
+        options["beginTime"] = new Date(requirements.rows[0]["raram_date"]).getTime()
     }
 
     const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options)
+    const matches = getRaramSearchedGames(matchList["matches"], limit)
 
     // TODO: this should not [0]... What if there are multiple matches?
     const matchData = await leagueJs.Match.gettingById(matchList["matches"][0]["gameId"])

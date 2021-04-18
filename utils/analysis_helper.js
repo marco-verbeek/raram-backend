@@ -208,3 +208,13 @@ exports.getWinFromAnalysis = (matchData, accountId) => {
 
     return _.find(matchData["teams"], {teamId: playerTeamId})["win"]
 }
+
+/**
+ * Takes the <b>last</b> n-amount of games from gameList.
+ * @param gameList the list containing all games
+ * @param amount the amount to take, starting from the end
+ * @returns {{unknown}[]}
+ */
+exports.getRaramSearchedGames = (gameList, amount) => {
+    return _.takeRight(gameList, amount)
+}

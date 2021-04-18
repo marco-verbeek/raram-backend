@@ -70,6 +70,9 @@ INSERT INTO raram.verifications(account_id, icons) VALUES('kLo8DCz3v3XOqIQGCcYk5
 INSERT INTO raram.users(account_id, summoner_name) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA', 'ItsDucky');
 INSERT INTO raram.stats(account_id) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA');
 
+--UPDATE raram.users SET raram_date = '2021-04-17 17:06:13.026301' WHERE summoner_name = 'ItsNexty';
+--UPDATE raram.users SET raram_amount = 2 WHERE summoner_name = 'ItsNexty';
+
 --SELECT * FROM raram.users;
 --SELECT * FROM raram.verifications;
 --SELECT * FROM raram.matches;
