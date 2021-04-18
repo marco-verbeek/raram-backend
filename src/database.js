@@ -39,6 +39,7 @@ module.exports = {
     insertStats: (params) => pool.query('INSERT INTO raram.stats(account_id) VALUES($1)', params),
 
     getUserByAccountId: (params) => pool.query('SELECT * FROM raram.users WHERE account_id = $1', params),
+    getUserRaramRequirements: (params) => pool.query('SELECT raram_amount, raram_date FROM raram.users WHERE account_id = $1', params),
     getMatchByIds: (params) => pool.query('SELECT * FROM raram.matches WHERE match_id = $1 AND account_id = $2', params),
     getSummonerByName: (params) => pool.query('SELECT summoner_name, lp FROM raram.users WHERE summoner_name = $1', params),
     getVerificationFromId: (params) => pool.query('SELECT * FROM raram.verifications WHERE account_id = $1', params),

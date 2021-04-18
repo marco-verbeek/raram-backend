@@ -6,66 +6,65 @@ const db = require("../../src/database");
 const {performMatchAnalysis, playerInfoFromAnalysis, getWinFromAnalysis} = require("../../utils/analysis_helper")
 const {leagueJs} = require('../../src/league')
 
-exports.match_analysis = function (req, res){
-    let accountId = ""
+exports.match_analysis = async function (req, res){
+    const dev = req.query.dev !== undefined ?? false
 
-    leagueJs.Summoner
-    .gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
-    .then(summonerData => {
-        accountId = summonerData["accountId"]
-        return leagueJs.Match.gettingListByAccount(accountId, "euw1", {queue: [450], endIndex: 1})
-    })
-    .then(matchesData => {
-        return leagueJs.Match.gettingById(matchesData["matches"][0]["gameId"])
-    })
-    .then(matchData => {
-        const matchAnalysis = performMatchAnalysis(matchData)
-        const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
+    const summonerData = await leagueJs.Summoner.gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
+    const accountId = summonerData["accountId"]
 
-        db.getUserByAccountId([accountId])
-        .then(result => {
-            if(result.rowCount === 0)
-                return res.json(matchAnalysis).status(200).end()
+    const options = {"queue": [450]}
+    if(dev){
+        options["endIndex"] = 1
+        //options["beginTime"] already defaults to 'now'.
+    } else {
+        const requirements = await db.getUserRaramRequirements([accountId])
 
-            db.getMatchByIds([matchData["gameId"], accountId])
-            .then(result => {
-                if(result.rowCount === 0){
-                    db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
-                    .then(() => {
-                        db.updatePlayerLP([accountId, playerData["lpGain"]])
-                        .then(() => {
-                            db.updatePlayerStats([
-                                accountId,
-                                playerData["kills"],
-                                playerData["deaths"],
-                                playerData["assists"],
-                                getWinFromAnalysis(matchAnalysis, accountId) ? 1 : 0,
-                                playerData["damageDone"],
-                                playerData["damageTaken"],
-                                playerData["healed"],
-                                playerData["doubleKills"],
-                                playerData["tripleKills"],
-                                playerData["quadraKills"],
-                                playerData["pentaKills"],
-                                playerData["goldEarned"],
-                                playerData["goldSpent"],
-                                playerData["totalMinionsKilled"],
-                                playerData["firstBloodKill"] ? 1 : 0,
-                                playerData["longestTimeSpentLiving"]
-                            ])
-                            .then(() => {
-                                db.updateHighestWinstreak(accountId)
-                            })
-                        })
-                    })
-                }
+        options["endIndex"] = requirements.rows[0]["raram_amount"]
+        options["beginTime"] = requirements.rows[0]["raram_date"]
+    }
 
-                return res.json(matchAnalysis).status(200).end();
-            })
-        })
-    })
-    .catch(err => {
-        console.error(err)
-        return res.json({"error": "An error occurred during match analysis"}).status(500).end()
-    })
+    const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options)
+
+    // TODO: this should not [0]... What if there are multiple matches?
+    const matchData = await leagueJs.Match.gettingById(matchList["matches"][0]["gameId"])
+
+    const matchAnalysis = performMatchAnalysis(matchData)
+    const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
+
+    const userData = await db.getUserByAccountId([accountId])
+
+    // User has no raram account, just display info TODO: remove LP or return you need an account
+    if(userData.rowCount === 0)
+        return res.json(matchAnalysis).status(200).end()
+
+    const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
+
+    if(dbMatch.rowCount === 0){
+        await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
+        await db.updatePlayerLP([accountId, playerData["lpGain"]])
+
+        await db.updatePlayerStats([
+            accountId,
+            playerData["kills"],
+            playerData["deaths"],
+            playerData["assists"],
+            getWinFromAnalysis(matchAnalysis, accountId) ? 1 : 0,
+            playerData["damageDone"],
+            playerData["damageTaken"],
+            playerData["healed"],
+            playerData["doubleKills"],
+            playerData["tripleKills"],
+            playerData["quadraKills"],
+            playerData["pentaKills"],
+            playerData["goldEarned"],
+            playerData["goldSpent"],
+            playerData["totalMinionsKilled"],
+            playerData["firstBloodKill"] ? 1 : 0,
+            playerData["longestTimeSpentLiving"]
+        ])
+
+        await db.updateHighestWinstreak(accountId)
+    }
+
+    return res.json(matchAnalysis).status(200).end();
 }

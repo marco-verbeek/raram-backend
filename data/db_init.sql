@@ -5,6 +5,8 @@ CREATE TABLE raram.users (
 	account_id VARCHAR (64) UNIQUE NOT NULL,
 	summoner_name VARCHAR (16),
 	lp FLOAT DEFAULT 0,
+	raram_amount INTEGER DEFAULT 1,
+	raram_start TIMESTAMP DEFAULT current_timestamp,
 	
 	PRIMARY KEY(account_id)
 );
