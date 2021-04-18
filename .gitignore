@@ -5,6 +5,7 @@
 data/*
 !data/champions.json
 !data/db_init.sql
+!data/db_misc.sql
 
 # Logs
 logs
