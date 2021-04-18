@@ -72,3 +72,4 @@ INSERT INTO raram.stats(account_id) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT
 --SELECT * FROM raram.verifications;
 --SELECT * FROM raram.matches;
 --SELECT * FROM raram.stats;
+--SELECT u.summoner_name, u.lp, s.current_winstreak, s.highest_winstreak FROM raram.users u, raram.stats s WHERE u.account_id = s.account_id
