@@ -18,7 +18,7 @@ exports.match_analysis = async function (req, res){
         limit = 1
         options["endIndex"] = limit
     } else {
-        const requirements = await db.getUserRaramRequirements([accountId])
+        const requirements = await db.getUserTimer([accountId])
 
         limit = requirements.rows[0]["raram_amount"]
         options["beginTime"] = new Date(requirements.rows[0]["raram_date"]).getTime()
