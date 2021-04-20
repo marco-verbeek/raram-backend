@@ -9,12 +9,13 @@ const {leagueJs} = require('../../src/league')
 exports.match_analysis = async function (req, res){
     const dev = req.query.dev !== undefined ?? false
 
-    const summonerData = await leagueJs.Summoner.gettingByName(req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty")
+    const summonerData = await leagueJs.Summoner.gettingByName(req.params.name)
     const accountId = summonerData["accountId"]
+    const user = await db.getSummonerByName([req.params.name])
     let limit
 
     const options = {"queue": [450]}
-    if(dev){
+    if(dev || user.rowCount === 0){
         limit = 1
         options["endIndex"] = limit
     } else {
@@ -24,10 +25,13 @@ exports.match_analysis = async function (req, res){
         options["beginTime"] = new Date(requirements.rows[0]["raram_date"]).getTime()
     }
 
-    const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options)
+    const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options).catch(() => {
+        return res.json({"error": "No match data could be found"}).status(200).end()
+    })
+
     const matches = getRaramSearchedGames(matchList["matches"], limit)
 
-    // TODO: this should not [0]... What if there are multiple matches?
+    // TODO: this should not [0]... What if there are multiple matches? TODO of course :)
     const matchData = await leagueJs.Match.gettingById(matchList["matches"][0]["gameId"])
 
     const matchAnalysis = performMatchAnalysis(matchData)
@@ -35,9 +39,11 @@ exports.match_analysis = async function (req, res){
 
     const userData = await db.getUserByAccountId([accountId])
 
-    // User has no raram account, just display info TODO: remove LP or return you need an account
-    if(userData.rowCount === 0)
+    // User has no raram account, just display info
+    if(userData.rowCount === 0){
+        matchAnalysis["raram"] = "Could not find a raram account linked to the search"
         return res.json(matchAnalysis).status(200).end()
+    }
 
     const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
 
@@ -47,7 +53,6 @@ exports.match_analysis = async function (req, res){
 
         await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
         await db.updatePlayerLP([accountId])
-
 
         await db.updatePlayerStats([
             accountId,
