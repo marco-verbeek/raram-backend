@@ -181,7 +181,8 @@ exports.performMatchAnalysis = (matchData) => {
         "match": {
             "gameDuration": matchData["gameDuration"],
             "gameCreation": matchData["gameCreation"],
-            "queueId": matchData["queueId"]
+            "queueId": matchData["queueId"],
+            "gameId": matchData["gameId"]
         }
     }
 }

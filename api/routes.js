@@ -8,6 +8,7 @@ const timer_controller = require('./controllers/timer_controller')
 
 // This endpoint provides the complete analysis to a match.
 router.get('/analysis/:name', analysis_controller.match_analysis)
+router.get('/analysis/only/:gameId', analysis_controller.only_analysis)
 
 // This endpoint provides an overview of a certain amount of recent matches.
 router.get('/overview/:name', overview_controller.overview)

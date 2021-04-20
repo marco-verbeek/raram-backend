@@ -26,7 +26,7 @@ exports.match_analysis = async function (req, res){
     }
 
     const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options).catch(() => {
-        return res.json({"error": "No match data could be found"}).status(200).end()
+        return res.json({"error": "No match data could be found"}).status(404).end()
     })
 
     // I do not know why the previous .catch does not return correctly.
@@ -55,8 +55,6 @@ exports.match_analysis = async function (req, res){
 
         // If the game has not been added to the database previously
         if(dbMatch.rowCount === 0){
-            console.log("match was not in db. adding now.")
-
             await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
             await db.updatePlayerLP([accountId])
 
@@ -85,4 +83,18 @@ exports.match_analysis = async function (req, res){
     }
 
     return res.json(analysisResult).status(200).end();
+}
+
+exports.only_analysis = async function (req, res){
+    if(req.params.gameId === undefined)
+        return res.json({"error": "Missing parameter matchId"}).status(404).end()
+
+    const matchData = await leagueJs.Match.gettingById(req.params.gameId)
+
+    if(matchData["participants"] === undefined)
+        return res.json({"error": "Could not find match with received id"}).status(404).end()
+
+    const matchAnalysis = performMatchAnalysis(matchData)
+
+    return res.json(matchAnalysis).status(200).end()
 }
