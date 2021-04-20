@@ -29,53 +29,60 @@ exports.match_analysis = async function (req, res){
         return res.json({"error": "No match data could be found"}).status(200).end()
     })
 
+    // I do not know why the previous .catch does not return correctly.
+    if(matchList["matches"] === undefined) return;
+
     const matches = getRaramSearchedGames(matchList["matches"], limit)
-
-    // TODO: this should not [0]... What if there are multiple matches? TODO of course :)
-    const matchData = await leagueJs.Match.gettingById(matchList["matches"][0]["gameId"])
-
-    const matchAnalysis = performMatchAnalysis(matchData)
-    const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
-
     const userData = await db.getUserByAccountId([accountId])
+    const isRaramUser = userData.rowCount !== 0
+
+    const analysisResult = []
 
     // User has no raram account, just display info
-    if(userData.rowCount === 0){
-        matchAnalysis["raram"] = "Could not find a raram account linked to the search"
-        return res.json(matchAnalysis).status(200).end()
+    if(isRaramUser){
+        analysisResult["raram"] = "Could not find a raram account linked to the search"
     }
 
-    const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
+    for(let i=0; i<matches.length; i++){
+        const matchData = await leagueJs.Match.gettingById(matchList["matches"][i]["gameId"])
 
-    // If the game has not been added to the database previously
-    if(dbMatch.rowCount === 0){
-        console.log("match was not in db. adding now.")
+        const matchAnalysis = performMatchAnalysis(matchData)
+        const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
 
-        await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
-        await db.updatePlayerLP([accountId])
+        analysisResult.push(matchAnalysis)
 
-        await db.updatePlayerStats([
-            accountId,
-            playerData["kills"],
-            playerData["deaths"],
-            playerData["assists"],
-            getWinFromAnalysis(matchAnalysis, accountId) ? 1 : 0,
-            playerData["damageDone"],
-            playerData["damageTaken"],
-            playerData["healed"],
-            playerData["doubleKills"],
-            playerData["tripleKills"],
-            playerData["quadraKills"],
-            playerData["pentaKills"],
-            playerData["goldEarned"],
-            playerData["goldSpent"],
-            playerData["totalMinionsKilled"],
-            playerData["firstBloodKill"] ? 1 : 0,
-            playerData["longestTimeSpentLiving"]
-        ])
+        const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
 
-        await db.updateHighestWinstreak([accountId])
+        // If the game has not been added to the database previously
+        if(dbMatch.rowCount === 0){
+            console.log("match was not in db. adding now.")
+
+            await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
+            await db.updatePlayerLP([accountId])
+
+            await db.updatePlayerStats([
+                accountId,
+                playerData["kills"],
+                playerData["deaths"],
+                playerData["assists"],
+                getWinFromAnalysis(matchAnalysis, accountId) ? 1 : 0,
+                playerData["damageDone"],
+                playerData["damageTaken"],
+                playerData["healed"],
+                playerData["doubleKills"],
+                playerData["tripleKills"],
+                playerData["quadraKills"],
+                playerData["pentaKills"],
+                playerData["goldEarned"],
+                playerData["goldSpent"],
+                playerData["totalMinionsKilled"],
+                playerData["firstBloodKill"] ? 1 : 0,
+                playerData["longestTimeSpentLiving"]
+            ])
+
+            await db.updateHighestWinstreak([accountId])
+        }
     }
 
-    return res.json(matchAnalysis).status(200).end();
+    return res.json(analysisResult).status(200).end();
 }
