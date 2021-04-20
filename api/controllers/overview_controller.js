@@ -3,10 +3,7 @@ const {getRecentMatches} = require("../../utils/overview_helper");
 const {leagueJs} = require("../../src/league");
 
 exports.overview = function (req, res){
-    const summonerName = req.query.name ?? process.env.DEFAULT_SUMMONER_NAME ?? "ItsNexty"
-
-    leagueJs.Summoner
-    .gettingByName(summonerName)
+    leagueJs.Summoner.gettingByName(req.params.name)
     .then(summonerData => {
         return db.getRecentMatches([summonerData["accountId"]])
     })
