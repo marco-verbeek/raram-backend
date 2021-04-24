@@ -25,6 +25,7 @@ exports.match_analysis = async function (req, res){
         options["beginTime"] = new Date(requirements.rows[0]["raram_date"]).getTime()
     }
 
+    // eslint-disable-next-line no-alert, quotes, semi
     const matchList = await leagueJs.Match.gettingListByAccount(accountId, "euw1", options).catch(() => {
         return res.json({"error": "No match data could be found"}).status(404).end()
     })
@@ -34,17 +35,17 @@ exports.match_analysis = async function (req, res){
 
     const matches = getRaramSearchedGames(matchList["matches"], limit)
     const userData = await db.getUserByAccountId([accountId])
-    const isRaramUser = userData.rowCount !== 0
+    const isRaramUser = userData.rowCount === 0
 
     const analysisResult = []
 
     // User has no raram account, just display info
-    if(isRaramUser){
+    if(!isRaramUser){
         analysisResult["raram"] = "Could not find a raram account linked to the search"
     }
 
     for(let i=0; i<matches.length; i++){
-        const matchData = await leagueJs.Match.gettingById(matchList["matches"][i]["gameId"])
+        const matchData = await leagueJs.Match.gettingById(matches[i]["gameId"])
 
         const matchAnalysis = performMatchAnalysis(matchData)
         const playerData = playerInfoFromAnalysis(matchAnalysis, accountId)
@@ -52,9 +53,12 @@ exports.match_analysis = async function (req, res){
         analysisResult.push(matchAnalysis)
 
         const dbMatch = await db.getMatchByIds([matchData["gameId"], accountId])
+        console.log('Analyzed match: ' + playerData["summonerName"] + ' played ' + playerData["champion"] + ' and gained ' + playerData["lpGain"] + ' LP.')
 
         // If the game has not been added to the database previously
         if(dbMatch.rowCount === 0){
+            console.log('and added it to db!')
+
             await db.insertMatch([matchData["gameId"], accountId, playerData["championId"], matchAnalysis["match"]["gameCreation"], playerData["lpGain"]])
             await db.updatePlayerLP([accountId])
 

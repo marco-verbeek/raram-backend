@@ -69,3 +69,7 @@ INSERT INTO raram.stats(account_id) VALUES('t-gqEaZF54d30hskcUpAKgH8MaYoiFIoQnmk
 INSERT INTO raram.verifications(account_id, icons) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA', '{}');
 INSERT INTO raram.users(account_id, summoner_name) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA', 'ItsDucky');
 INSERT INTO raram.stats(account_id) VALUES('kLo8DCz3v3XOqIQGCcYk5_Jh8nPnzo6GPYRT-v-XFO8RAA');
+
+INSERT INTO raram.verifications(account_id, icons) VALUES('lvqVZTnQ2HvdPSFvh4pCUvcgf4tu5umNjUhJgtfFmM6yQw', '{}');
+INSERT INTO raram.users(account_id, summoner_name) VALUES('lvqVZTnQ2HvdPSFvh4pCUvcgf4tu5umNjUhJgtfFmM6yQw', 'LaTempeteGrise');
+INSERT INTO raram.stats(account_id) VALUES('lvqVZTnQ2HvdPSFvh4pCUvcgf4tu5umNjUhJgtfFmM6yQw');
