@@ -1,7 +1,21 @@
 # Ranked ARAM Tool
-Spare-time created tool with friends. <br/>
-"Compare your performance to your team's using rARAM.gg!"
+Spare-time created tool, calculates how much LP you would have gained if the ARAM was "Ranked".
+Uses the Riot API in order to get recent match data. Only analyses ARAM games.
 
+LP gain is saved to a PgSQL database in order to determine a rank. Account needs to be linked by selecting specific raram-selected icons to prove account ownership.
+
+LP is calculated by:
+- team-compared player damage done, taken or healed (NB: only best one is selected and effectively compared and has an impact on LP, to account for supports like Yuumi that do not deal nor take damage.)
+- team compared Kill Participation, which boils down to a kills + assists comparison.
+- team-compared Deaths
+
+Endpoints:
+GET /api/analysis?name={summonerName}
+GET /api/profile
+GET /api/profile/summary
+POST /api/profile/verificon
+
+!! This tool is not maintainted anymore, as Riot has not responded yet to our mail.
 
 ## Project setup
 ```
@@ -28,7 +42,7 @@ Please create a .env file with following variables:
 |:----------:|:----------:|:----------:
 | LEAGUE_API_KEY | none | Your Riot API Key
 | LEAGUE_API_PLATFORM_ID | euw1 | Riot API Region ID
-| DEFAULT_SUMMONER_NAME | ItsNexty | Default name used if none specified during GET /api/analysis
+| DEFAULT_SUMMONER_NAME | none | Default name used if none specified during GET /api/analysis
 | PORT | 5000 | ExpressJS Server Port
 | DB_USER | postgres | PgSQL Username
 | DB_PASSWORD | none | PgSQL Password
