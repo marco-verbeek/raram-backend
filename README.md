@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/marco-verbeek/raram-backend/badge)](https://www.codefactor.io/repository/github/marco-verbeek/raram-backend)
 # Ranked ARAM Tool
 Spare-time created tool, calculates how much LP you would have gained if the ARAM was "Ranked".
 Uses the Riot API in order to get recent match data. Only analyses ARAM games.
