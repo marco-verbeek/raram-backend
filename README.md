@@ -16,7 +16,7 @@ GET /api/profile
 GET /api/profile/summary
 POST /api/profile/verificon
 
-!! This tool is not maintainted anymore, as Riot has not responded yet to our mail.
+!! This tool is not maintainted anymore, please use raram-backend-v2, as its code base is a lot cleaner.
 
 ## Project setup
 ```
